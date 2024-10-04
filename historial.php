@@ -119,7 +119,7 @@ $selectProducto .= "</select>";
             var listaCarrito = $('#listaCarrito');
             listaCarrito.empty();
 
-            carrito.foreach(function(item) {
+            carrito.forEach(function(item) {
                 listaCarrito.append('<li>' + item.nombre + ': ' + item.total + '€</li>');
             });
 
@@ -134,7 +134,6 @@ $selectProducto .= "</select>";
             $('#cantidad').val(0);
             $('#precio').val(0);
             nombreProd = $("#nombreFr option:selected").text();
-            console.log(nombreProd);
         });
 
         $('#cantidad, #precio').change(function(){
@@ -142,7 +141,6 @@ $selectProducto .= "</select>";
             cantidad = $("#cantidad").val();
             var ressultado =calculaResultado(cantidad, precio);
             mostrarCarrito();
-            console.log(precio, cantidad);
         });
 
         $("#btnCarrito").click(function () {
@@ -152,7 +150,7 @@ $selectProducto .= "</select>";
                 carrito.push({ nombre: nombreProd, total: resultado});
                 mostrarCarrito();
             } else {
-                alert('asegurate de no cagarla')
+                alert('asegurate de no cagarla');
             }
         });
     });
