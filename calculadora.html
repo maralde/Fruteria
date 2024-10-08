@@ -55,44 +55,29 @@
 
     <script>
       $(document).ready(function () {
-        var valor1 = null;
-        var operacion = null;
-        var resultado = null;
-        var carrito = [];
+        var ValorOperacion = [];
 
-        $(".btn-group button").on("click", function () {
-          if (this.id !== "igual") {
-            if (resultado !== null) {
-              valor1 = resultado;
-            } else {
-              valor1 = parseFloat($("#valor").val());
-            }
-            operacion = this.id;
-            $("#valor").val("");
+        $('.btn-group button').on('click', function(){
+          var ValorActual = parseFloat($('#valor').val());
+          if(this.id === 'igual' && ValorOperacion.length > 0){
+            if(!isNaN(ValorActual)) ValorOperacion.push(ValorActual);
+
+            var Cadena = ValorOperacion.join(' ');
+            var resultado = eval(Cadena);
+
+            $('#resultado').text(`Resultado: ${resultado}`).show();
+
+            $('#valor').val('');
+            ValorOperacion.length = 0;
+          } else if (!isNaN(ValorActual)) {
+            ValorOperacion.push(ValorActual);
+            var operador =  (this.id === 'suma') ? '+':
+                            (this.id === 'resta') ? '-': '*';
+            ValorOperacion.push(operador);
+
+            $('#valor').val('');
           } else {
-            var valor2 = parseFloat($("#valor").val());
-
-            // Realizar operación
-            if (operacion === "suma") {
-              resultado = valor1 + valor2;
-            } else if (operacion === "resta") {
-              resultado = valor1 - valor2;
-            } else if (operacion === "multiplicacion") {
-              resultado = valor1 * valor2;
-            }
-
-            $("#valor").val(resultado);
-
-            var NombreOperacion = `La operación ${valor1} ${operacion} ${valor2} = ${resultado}`;
-            carrito.push({ Operacion: NombreOperacion });
-
-            var listaCarrito = $("#listaCarrito");
-            listaCarrito.empty(); // Limpiar lista
-            carrito.forEach(function (ValoresArray) {
-              listaCarrito.append("<li>" + ValoresArray.Operacion + "</li>");
-            });
-
-            $("#resultado").text(`El resultado de la operación es: ${resultado}`).show();
+            alert('Introduce un valor antes de seleccionar una operacion.');
           }
         });
       });
