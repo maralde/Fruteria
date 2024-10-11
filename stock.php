@@ -72,7 +72,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 
 <body>
+   <?php echo $nav; ?>
     <div class="container d-flex justify-content-center align-items-center vh-100">
+        
         <div class="card shadow-sm" style="width: 400px;">
             <div class="card-header bg-green text-dark text-center">
                 <h4 class="mb-0">Historial</h4>
@@ -98,5 +100,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </html>

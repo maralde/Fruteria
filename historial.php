@@ -12,18 +12,34 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
 }
+$esAdmin = false;
+if (session_start() && $_SESSION["Nombre"] == "Pepi") {
+    $esAdmin = true;
+    echo "Hola " . $_SESSION["Nombre"];
 
-$sql = "SELECT * FROM producto";
-$result = $conn->query($sql);
+    $sql = "SELECT * FROM producto";
+    $result = $conn->query($sql);
 
 
-$selectProducto = "<select name='producto' id='nombreFr' class='form-select'>";
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $selectProducto .= "<option value='" . $row['Id_producto'] . "'>" . $row['Nombre_prod'] . "</option>";
+    $selectProducto = "<select name='producto' id='nombreFr' class='form-select'>";
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $selectProducto .= "<option value='" . $row['Id_producto'] . "'>" . $row['Nombre_prod'] . "</option>";
+        }
     }
+    $selectProducto .= "</select>";
+    //*Si usamos el metodo POST para cerrar sesión sería asi
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['btnCerrarSesion'])) {
+        session_unset();
+        session_destroy();
+
+        header("Location: login.php");
+        exit();
+    }
+
+} else {
+    $contenido = "<h1>No eres pepi, ve al <a href='login.php' class='btn btn-danger'>login</a></h1>";
 }
-$selectProducto .= "</select>";
 
 
 ?>
@@ -67,47 +83,63 @@ $selectProducto .= "</select>";
 </head>
 
 <body>
-    <div class="container d-flex justify-content-center align-items-center vh-100">
-        <div class="card shadow-sm" style="width: 400px;">
-            <div class="card-header bg-green text-dark text-center">
-                <h4 class="mb-0">Historial</h4>
+    <?php if ($esAdmin) {
+
+        ?>
+        <!-- la forma más comun es con el A y con el hiperenlace -->
+        <a href="CerrarSesion.php" class="btn btn-danger">Cerrar Sesión</a>
+        <div class="container d-flex justify-content-center align-items-center h-75">
+            <div class="card shadow-sm" style="width: 400px;">
+                <div class="card-header bg-green text-dark text-center">
+                    <h4 class="mb-0">Historial</h4>
+                </div>
+                <div class="card-body">
+                    <form action="insertHistorial.php" method="post">
+
+                        <div class="mb-3">
+                            <label for="producto" class="form-label">Tipo</label>
+                            <?php echo $selectProducto; ?>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="cantidad" class="form-label">Cantidad comprada</label>
+                            <input type="number" id="cantidad" class="form-control" placeholder="Introduce la cantidad"
+                                name="cantidad" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="precio" class="form-label">Precio del producto</label>
+                            <input type="number" id="precio" step="0.01" class="form-control"
+                                placeholder="Introduce el precio" name="precio" required />
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-green text-dark">Enviar</button></br></br>
+                            <button type="button" class="btn btn-blue text-dark" id="btnCarrito">Añadir al carrito</button>
+                        </div>
+                    </form>
+                    <form method="POST">
+                        <div class="d-grid mt-3">
+                            <button type="submit" class="btn btn-danger" name="btnCerrarSesion">Cerrar Sesión</button>
+
+                        </div>
+                    </form>
+                    <div id="resultadoCarrito"></div>
+                </div>
+                <div id="listaCarrito"></div>
             </div>
-            <div class="card-body">
-                <form action="insertHistorial.php" method="post">
-
-                    <div class="mb-3">
-                        <label for="producto" class="form-label">Tipo</label>
-                        <?php echo $selectProducto; ?>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="cantidad" class="form-label">Cantidad comprada</label>
-                        <input type="number" id="cantidad" class="form-control" placeholder="Introduce la cantidad"
-                            name="cantidad" required/>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="precio" class="form-label">Precio del producto</label>
-                        <input type="number" id="precio" step="0.01" class="form-control"
-                            placeholder="Introduce el precio" name="precio" required />
-                    </div>
-
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-green text-dark">Enviar</button></br></br>
-                        <button type="button" class="btn btn-blue text-dark" id="btnCarrito">Añadir al carrito</button>
-                    </div>
-                </form>
-                <div id="resultadoCarrito"></div>
-            </div>
-            <div id="listaCarrito"></div>
         </div>
-    </div>
+    <?php
+    } else {
+        ?>
+        <h1>No eres pepi, ve al <a href='login.php' class='btn btn-danger'>login</a></h1>
+    <?php } ?>
 </body>
 <script>
     $(document).ready(function () {
 
         function calculaResultado(c, p) {
-            return c*p;
+            return c * p;
         }
 
         var carrito = [];
@@ -115,15 +147,15 @@ $selectProducto .= "</select>";
         var cantidad = 0;
         var nombreProd = "";
 
-        function mostrarCarrito(){
+        function mostrarCarrito() {
             var listaCarrito = $('#listaCarrito');
             listaCarrito.empty();
 
-            carrito.forEach(function(item) {
+            carrito.forEach(function (item) {
                 listaCarrito.append('<li>' + item.nombre + ': ' + item.total + '€</li>');
             });
 
-            var totalCarrito = carrito.reduce(function(total, item) {
+            var totalCarrito = carrito.reduce(function (total, item) {
                 return total + item.total;
             }, 0);
 
@@ -136,18 +168,18 @@ $selectProducto .= "</select>";
             nombreProd = $("#nombreFr option:selected").text();
         });
 
-        $('#cantidad, #precio').change(function(){
+        $('#cantidad, #precio').change(function () {
             precio = $("#precio").val();
             cantidad = $("#cantidad").val();
-            var ressultado =calculaResultado(cantidad, precio);
+            var ressultado = calculaResultado(cantidad, precio);
             mostrarCarrito();
         });
 
         $("#btnCarrito").click(function () {
 
-            if(cantidad > 0 && precio > 0){
+            if (cantidad > 0 && precio > 0) {
                 var resultado = calculaResultado(cantidad, precio);
-                carrito.push({ nombre: nombreProd, total: resultado});
+                carrito.push({ nombre: nombreProd, total: resultado });
                 mostrarCarrito();
             } else {
                 alert('asegurate de no cagarla');
