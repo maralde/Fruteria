@@ -1,7 +1,7 @@
 <?php
 require_once('./configure/configure.php');
 
-$sql='SELECT h.Id_producto AS Id, p.Nombre_prod AS nombre, SUM(h.Cantidad_compra)AS cantidad, AVG(h.Precio_compra) AS precio, (Sum(h.Cantidad_compra) * AVG(h.Precio_compra)) AS precioTotal FROM historial AS h INNER JOIN producto AS p ON h.Id_producto = p.Id_producto GROUP BY h.Id_producto, p.Id_producto';
+$sql='SELECT h.Id_producto AS Id_prod, p.Id_producto AS Id, p.Nombre_prod AS nombre, SUM(h.Cantidad_compra)AS cantidad, AVG(h.Precio_compra) AS precio, (Sum(h.Cantidad_compra) * AVG(h.Precio_compra)) AS precioTotal FROM historial AS h INNER JOIN producto AS p ON h.Id_producto = p.Id_producto GROUP BY h.Id_producto, p.Id_producto';
 
 $result = $conn->query($sql);
 $tabla = "";
@@ -14,6 +14,8 @@ if($result -> num_rows > 0){
             <th> Cantidad KG </th>
             <th> Precio Medio € </th>
             <th> Precio total € </th>
+            <th> Eliminar Producto </th>
+            <th> Informacion Producto </th>
         </tr>
     </thead>
     <tbody>";
@@ -24,6 +26,8 @@ if($result -> num_rows > 0){
         <td>".$row["cantidad"]."</td>
         <td>".round($row["precio"],2)."</td>
         <td>".round($row["precioTotal"],2)."</td>
+        <td><a href='eliminarProd.php?IdProd=".$row["Id"]."'>Eliminar Prod</a></td>
+        <td><a href='informacionProd.php?IdProd=".$row["Id"]."'>Informacion Producto</a></td>
         </tr>";
     }
     $tabla .="</tbody></table>";
