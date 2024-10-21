@@ -5,7 +5,7 @@ require_once('./configure/configure.php');
 if(isset($_GET['IdProd'])){
     $idProd = $_GET['IdProd'];
 
-    $sql = "SELECT p.Nombre_prod AS nombre, tip.Nombre_tipo AS tipo, c.Nombre_cat AS categoria, tem.Nombre_temp AS temporada, p.Descripcion AS descripcion FROM producto AS p INNER JOIN tipo AS tip ON p.Id_tipo = tip.Id_tipo INNER JOIN categorias AS c ON p.Id_categoria = c.Id_categoria INNER JOIN temporada AS tem ON p.Id_temporada = tem.Id_temporada WHERE p.Id_producto = '$idProd'";
+    $sql = "SELECT p.Nombre_prod AS nombre, tip.Nombre_tipo AS tipo, c.Nombre_cat AS categoria, tem.Nombre_temp AS temporada, p.Descripcion AS descripcion, p.Imagen AS imagen FROM producto AS p INNER JOIN tipo AS tip ON p.Id_tipo = tip.Id_tipo INNER JOIN categorias AS c ON p.Id_categoria = c.Id_categoria INNER JOIN temporada AS tem ON p.Id_temporada = tem.Id_temporada WHERE p.Id_producto = '$idProd'";
 
     $result = $conn->query($sql);
 
@@ -17,8 +17,18 @@ if(isset($_GET['IdProd'])){
         $Categoria = $row["categoria"];
         $Temporada = $row["temporada"];
         $Descripcion = $row["descripcion"];
+        $Imagen ="<img src='./". $row["imagen"]. "' alt='Imagen de ".$row["nombre"]."' class='img-fluid'>" ;
+    } else {
+        echo "No se encontraron resultados.";
     }
 
+} else {
+    $Nombre = " ";
+    $Tipo = " ";
+    $Categoria = " ";
+    $Temporada = " ";
+    $Descripcion = " ";
+    $Imagen = " ";
 }
 ?>
 
@@ -73,6 +83,7 @@ if(isset($_GET['IdProd'])){
             <h4 class="mb-0">
                 <?php echo $Nombre; ?>
             </h4>
+            <?php echo $Imagen; ?>
         </div>
 
         <!-- Card Body -->

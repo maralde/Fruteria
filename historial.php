@@ -1,13 +1,5 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-$servername = "localhost";
-$username = "Marcos";
-$password = "DAW2425";
-$dbname = "fruteriapepi";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
+require_once('./configure/configure.php');
 
 if ($conn->connect_error) {
     die("Conexión fallida: " . $conn->connect_error);
@@ -15,7 +7,6 @@ if ($conn->connect_error) {
 $esAdmin = false;
 if (session_start() && $_SESSION["Nombre"] == "Pepi") {
     $esAdmin = true;
-    echo "Hola " . $_SESSION["Nombre"];
 
     $sql = "SELECT * FROM producto";
     $result = $conn->query($sql);
@@ -84,10 +75,10 @@ if (session_start() && $_SESSION["Nombre"] == "Pepi") {
 
 <body>
     <?php if ($esAdmin) {
-
+        echo $nav;
         ?>
+    
         <!-- la forma más comun es con el A y con el hiperenlace -->
-        <a href="CerrarSesion.php" class="btn btn-danger">Cerrar Sesión</a>
         <div class="container d-flex justify-content-center align-items-center h-75">
             <div class="card shadow-sm" style="width: 400px;">
                 <div class="card-header bg-green text-dark text-center">
@@ -114,13 +105,15 @@ if (session_start() && $_SESSION["Nombre"] == "Pepi") {
                         </div>
 
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-green text-dark">Enviar</button></br></br>
-                            <button type="button" class="btn btn-blue text-dark" id="btnCarrito">Añadir al carrito</button>
+                            <input type="hidden" name="carritoJson" id="carritoJson">
+                            <button type="submit" class="btn btn-green text-dark">Enviar</button></br>
+                            <button type="button" class="btn btn-blue text-dark" id="btnCarrito">Añadir al carrito</button></br>
+                            <button type="button" class="btn text-dark" id="vaciarCarrito">Vaciar Carrito</button>
                         </div>
                     </form>
                     <form method="POST">
                         <div class="d-grid mt-3">
-                            <button type="submit" class="btn btn-danger" name="btnCerrarSesion">Cerrar Sesión</button>
+                        <a href="CerrarSesion.php" class="btn btn-danger">Cerrar Sesión</a>
 
                         </div>
                     </form>
@@ -155,7 +148,7 @@ if (session_start() && $_SESSION["Nombre"] == "Pepi") {
                 listaCarrito.append('<li>' + item.nombre + ': ' + item.total + '€</li>');
             });
 
-            var totalCarrito = carrito.reduce(function (total, item) {
+            let totalCarrito = carrito.reduce(function (total, item) {
                 return total + item.total;
             }, 0);
 
@@ -179,11 +172,28 @@ if (session_start() && $_SESSION["Nombre"] == "Pepi") {
 
             if (cantidad > 0 && precio > 0) {
                 var resultado = calculaResultado(cantidad, precio);
-                carrito.push({ nombre: nombreProd, total: resultado });
+            precioAct = $("#precio").val();
+            cantidadAct = $("#cantidad").val();
+                carrito.push({ nombre: nombreProd, precio: precioAct, cantidad: cantidadAct, total: resultado });
                 mostrarCarrito();
             } else {
                 alert('asegurate de no cagarla');
             }
+        });
+        
+
+        $("#vaciarCarrito").click(function(){
+            carrito = [];
+            mostrarCarrito();
+            cantidad = 0;
+            precio = 0;
+            $('#MuestraResultado').html('');
+        });
+
+        $("#carrito").submit(function(e){
+            e.preventDefault();
+            $('#carritoJson').val(JSON.stringify(carrito));
+            this.submit();
         });
     });
 </script>

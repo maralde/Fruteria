@@ -1,16 +1,5 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-$servername = "localhost";
-$username = "Marcos";
-$password = "DAW2425";
-$dbname = "fruteriapepi";
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Conexión fallida: " . $conn->connect_error);
-}
+require_once('./configure/configure.php');
 
 $sql = "SELECT * FROM tipo";
 $result = $conn->query($sql);
@@ -68,13 +57,14 @@ $selectTemporada .= "</select>";
 </head>
 
 <body>
-    <div class="container d-flex justify-content-center align-items-center vh-100">
+<?php echo $nav; ?>    
+    <div class="container d-flex justify-content-center align-items-center">
         <div class="card shadow-sm" style="width: 400px;">
             <div class="card-header bg-green text-dark text-center">
                 <h4 class="mb-0">🍎Pepi's Fruit🍏</h4>
             </div>
             <div class="card-body">
-                <form action="insert.php" method="post">
+                <form action="insert.php" method="post" enctype="multipart/form-data">
 
                     <div class="mb-3">
                         <label for="producto" class="form-label">Producto</label>
@@ -90,6 +80,16 @@ $selectTemporada .= "</select>";
                     <div class="mb-3">
                         <label for="temporada" class="form-label">Temporada</label>
                         <?php echo $selectTemporada; ?>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="Descripcion" class="form-label">Descripción</label>
+                        <input name="descripcion" id="descripcion" type="text"/>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="archivo" class="form-label">Imagen</label>
+                        <input name="archivo" id="archivo" type="file"/>
                     </div>
 
                     <div class="d-grid">
